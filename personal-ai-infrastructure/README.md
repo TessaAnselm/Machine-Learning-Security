@@ -165,11 +165,7 @@ bash install.sh
   <em>PAI v4.0.3 installer running on Debian</em>
 </p>
 
-Follow the installer prompts.
-
-### Bun runtime
-
-PAI's installer installs the [Bun](https://bun.sh) runtime automatically — you can see it happen in the installer output above (`Installing Bun runtime...`). Bun is what runs the `pai` launcher (`pai.ts`), so it needs to be present before you can launch PAI.
+Before it prompts you for anything, the installer checks prerequisites and installs the [Bun](https://bun.sh) runtime automatically — visible above as `Installing Bun runtime...`. Bun is what runs the `pai` launcher (`pai.ts`), so it needs to be present before you can launch PAI.
 
 Verify it's there:
 
@@ -183,6 +179,8 @@ If it's missing, install it manually:
 curl -fsSL https://bun.sh/install | bash
 source ~/.bashrc
 ```
+
+Once that's done, follow the interactive prompts.
 
 ### Voice/audio note
 
@@ -546,5 +544,6 @@ For sensitive email, consider beginning with a test inbox or non-sensitive sampl
 
 # References
 
+- [Sam Bowne — ML 190: Personal AI Infrastructure](https://samsclass.info/ML/proj/ML190.htm)
 - [Daniel Miessler — Personal AI Infrastructure / LifeOS](https://github.com/danielmiessler/Personal_AI_Infrastructure)
 - [Claude Code](https://claude.ai/code)
