@@ -1,25 +1,23 @@
 # Personal AI Infrastructure (PAI) and LifeOS on Debian
 
-A practical walkthrough for running two generations of Daniel Miessler's personal AI framework on top of [Claude Code](https://claude.ai/code) inside a Debian VM.
+A practical walkthrough for running two generations of Daniel Miessler's Personal AI Infrastructure on top of [Claude Code](https://claude.ai/code) inside a Debian VM.
 
-The goal is to keep the older PAI release available for reference or coursework while running the current LifeOS release in a separate Linux user account. Keeping them isolated prevents their Claude configuration, tools, and dependencies from colliding.
+This walkthrough covers:
 
-## Overview
-
-This setup uses two separate Linux users:
-
-- **Admin user** — a sudo-enabled account used for the earlier PAI v4.0.3 environment.
-- **`personalai`** — a regular, non-sudo account used for the current LifeOS v7.40.4 environment.
-
-Each user has a separate home directory and its own `~/.claude` configuration.
+- PAI v4.0.3
+- LifeOS v7.40.4
+- Claude Code on Debian
+- Bash `PATH` troubleshooting
+- optional Linux user isolation
+- basic VM resource and security considerations
 
 ## Environment
 
 ![Debian 12 bookworm, confirmed via /etc/os-release](./System.png)
 
-Both frameworks run inside a Debian VM rather than directly on the host machine. This creates a useful isolation boundary: the VM has its own filesystem, users, and software environment.
+Both environments run inside a Debian VM rather than directly on the host machine. The VM provides its own filesystem, users, and software environment.
 
-Access to host files, browser profiles, credentials, shared folders, clipboard data, or other host resources depends on what you explicitly expose through your VM configuration.
+Access to host files, browser profiles, credentials, shared folders, clipboard data, or other host resources depends on what is explicitly exposed through the VM configuration.
 
 - **VM:** Debian GNU/Linux 12 (bookworm)
 - **Agent runtime:** Claude Code CLI
@@ -31,7 +29,7 @@ Access to host files, browser profiles, credentials, shared folders, clipboard d
 
 # Setup 1: PAI v4.0.3
 
-Use a sudo-enabled Linux account for the earlier PAI release.
+The earlier PAI release was installed using a sudo-enabled Linux account.
 
 ## 1. Confirm your current user
 
@@ -39,16 +37,18 @@ Use a sudo-enabled Linux account for the earlier PAI release.
 whoami
 ```
 
-Make sure you are logged into the account you want to use for the PAI v4.0.3 installation.
+Make sure you are logged into the account you want to use for the PAI installation.
 
 ## 2. Install prerequisites
+
+Update the package list and install `curl` and Git:
 
 ```bash
 sudo apt update
 sudo apt install curl git -y
 ```
 
-If you are using VMware with a desktop environment:
+If you are running Debian as a VMware desktop VM, you can also install VMware guest tools:
 
 ```bash
 sudo apt install open-vm-tools-desktop -y
@@ -59,11 +59,31 @@ After the reboot, log back in.
 
 ## 3. Install Claude Code
 
+Run:
+
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-On Debian, Bash may not automatically include `~/.local/bin` in your `PATH`. If `claude` is not found, run:
+![Claude Code installation on Debian](./InstallClaude.png)
+
+### Fix the Bash PATH if needed
+
+On Debian, `~/.local/bin` may not automatically be included in your Bash `PATH`.
+
+If running:
+
+```bash
+claude --help
+```
+
+returns:
+
+```text
+bash: claude: command not found
+```
+
+add Claude Code's installation directory to your `PATH`:
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
@@ -72,7 +92,7 @@ source ~/.bashrc
 
 ![Adding ~/.local/bin to PATH so the claude command resolves](./Addpath.png)
 
-Verify the installation:
+Verify:
 
 ```bash
 claude --version
@@ -80,30 +100,41 @@ claude --version
 
 ## 4. Clone the PAI repository
 
+Run:
+
 ```bash
 cd ~
 git clone https://github.com/danielmiessler/Personal_AI_Infrastructure.git
 cd Personal_AI_Infrastructure
 ```
 
-![Installing Daniel Miessler's PAI: cloning the repo and checking out v4.0.3](./DanielMieslerPAI.png)
+![Cloning the Personal AI Infrastructure repository](./DanielMieslerPAI.png)
 
-The current repository checkout may not contain the older `Releases/v4.0.3` directory. Fetch the historical tags and switch to the version used by this setup:
+The current repository may contain a newer release rather than the older `Releases/v4.0.3` directory.
+
+Fetch the historical tags:
 
 ```bash
 git fetch --tags
+```
+
+Then switch to the version used for this setup:
+
+```bash
 git checkout v4.0.3
 ```
 
-Verify that the release files are present:
+Verify the release:
 
 ```bash
 ls -la Releases/v4.0.3
 ```
 
-You should see a `.claude` directory.
+The directory should contain a `.claude` folder.
 
 ## 5. Install PAI v4.0.3
+
+Run:
 
 ```bash
 cd Releases/v4.0.3
@@ -112,13 +143,13 @@ cd ~/.claude
 bash install.sh
 ```
 
-![PAI v4.0.3 installer banner, detecting platform and installing the Bun runtime](./PAI.png)
+![PAI v4.0.3 installer running on Debian](./PAI.png)
 
 Follow the installer prompts.
 
 ### Voice/audio note
 
-Voice features were skipped in this VM because no working audio device was passed through. They are not required for the rest of this walkthrough.
+Voice features were skipped in this VM because a working audio device was not configured. Voice is not required for the rest of this walkthrough.
 
 ### Bash vs. zsh
 
@@ -128,29 +159,33 @@ The installer may tell you to run:
 source ~/.zshrc && pai
 ```
 
-Debian commonly uses Bash instead of zsh. If `~/.zshrc` does not exist, use:
+Debian commonly uses Bash instead of zsh.
+
+If `~/.zshrc` does not exist, run:
 
 ```bash
 source ~/.bashrc
 ```
 
-![PAI install complete](./SuccessInstallPAI.png)
+![PAI installation completed successfully](./SuccessInstallPAI.png)
 
 ## 6. Verify the PAI launcher
 
-Check whether the `pai` alias was created:
+Check whether the `pai` alias exists:
 
 ```bash
 type pai
 ```
 
-A working installation should return an alias that points to the PAI TypeScript launcher under your own home directory, for example:
+A working installation should return an alias pointing to the PAI TypeScript launcher under your current user's home directory.
+
+For example:
 
 ```text
 pai is aliased to `bun /home/<your-user>/.claude/PAI/Tools/pai.ts'
 ```
 
-You can also inspect the alias in your Bash configuration:
+You can also check your Bash configuration:
 
 ```bash
 grep "alias pai" ~/.bashrc
@@ -162,30 +197,49 @@ Then launch PAI:
 pai
 ```
 
-![Claude Code launched from the PAI workspace](./ClaudeCodeLaunch.png)
+![PAI home page loaded successfully](./paiload.png)
 
-If `pai` launches successfully, the PAI v4.0.3 environment is ready.
+If the PAI interface loads, the PAI v4.0.3 environment is ready.
 
 ---
 
 # Setup 2: LifeOS v7.40.4
 
-For the current release, use a separate Linux user so it does not share the older PAI user's `~/.claude` directory.
+LifeOS is the current generation of the framework and uses a different installation process from PAI v4.0.3.
 
-## 1. Create or switch to the LifeOS user
+## Optional: Use a Separate Linux User
 
-If the user does not already exist, create it from a sudo-enabled account:
+A separate Linux user is **not required by LifeOS**.
 
-```bash
-sudo adduser personalai
+For this experiment, I used a second Linux user to keep the current LifeOS environment isolated from the older PAI v4.0.3 installation.
+
+This gives each environment its own:
+
+```text
+home directory
+~/.claude
+shell configuration
+user-level tools
 ```
 
-For stronger separation, leave `personalai` as a regular non-sudo user unless LifeOS specifically needs administrative access for something you approve.
+This is useful when comparing releases because changes made in one user's Claude environment are less likely to interfere with the other.
 
-Switch to the user:
+If you do not need this separation, you can install LifeOS using your existing Linux account and skip this section.
+
+### Create a separate user
+
+From a sudo-enabled account:
 
 ```bash
-su - personalai
+sudo adduser <lifeos-user>
+```
+
+For stronger separation, the LifeOS user can remain a regular non-sudo account unless administrative privileges are specifically needed.
+
+Switch to the new account:
+
+```bash
+su - <lifeos-user>
 ```
 
 Verify:
@@ -195,26 +249,26 @@ whoami
 echo $HOME
 ```
 
-Expected:
+You should see your new username and its corresponding home directory:
 
 ```text
-personalai
-/home/personalai
+<lifeos-user>
+/home/<lifeos-user>
 ```
 
-The `-` in `su - personalai` loads that user's login environment, including its home directory and shell configuration.
+The `-` in `su -` starts a login shell and loads that user's home environment.
 
-## 2. Install Claude Code for `personalai`
+---
 
-Because each Linux user has a separate home directory, install Claude Code for this account too:
+## 1. Install Claude Code
+
+If you are using a separate Linux account, install Claude Code for that user:
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-![Claude Code install for the personalai user, PATH warning included](./InstallClaude.png)
-
-If needed, add Claude to the Bash `PATH`:
+If `claude` is not found after installation:
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
@@ -227,15 +281,15 @@ Verify:
 claude --version
 ```
 
-## 3. Install Bun
+## 2. Check Bun
 
-Check whether Bun is already installed:
+Check whether Bun is available:
 
 ```bash
 bun --version
 ```
 
-If it is missing:
+If Bun is not installed:
 
 ```bash
 curl -fsSL https://bun.sh/install | bash
@@ -248,11 +302,11 @@ Verify:
 bun --version
 ```
 
-In this setup, the installer detected Bun v1.4.0.
+In this environment, LifeOS detected Bun during installation.
 
-## 4. Install the current LifeOS release
+## 3. Install LifeOS
 
-Run:
+Run the current LifeOS installer:
 
 ```bash
 curl -fsSL https://ourlifeos.ai/install.sh | bash
@@ -260,17 +314,25 @@ curl -fsSL https://ourlifeos.ai/install.sh | bash
 
 ![LifeOS v7.40.4 installer starting](./InstallLifeOS.png)
 
-For this installation, LifeOS was placed under:
+During this installation, the installer detected the required prerequisites and installed the LifeOS skill under the current user's Claude environment:
 
 ```text
-/home/personalai/.claude/skills/LifeOS
+~/.claude/skills/LifeOS
 ```
 
-The current LifeOS installation process is different from the older PAI v4.0.3 workflow. Do **not** use the old `cp -r .claude ~/` command for LifeOS v7.40.4.
+The current LifeOS installation process is different from the older PAI v4.0.3 installation.
 
-## 5. Trust the workspace
+Do **not** use the old:
 
-Claude Code may display a workspace safety prompt:
+```bash
+cp -r .claude ~/
+```
+
+PAI installation method for LifeOS v7.40.4.
+
+## 4. Trust the Workspace
+
+During setup, Claude Code may display:
 
 ```text
 Quick safety check:
@@ -280,25 +342,48 @@ Is this a project you created or one you trust?
 2. No, exit
 ```
 
-Only choose **Yes** for a project you intentionally downloaded or created and are comfortable allowing Claude Code to read, edit, and execute files within.
+Only select **Yes** if you trust the project directory and are comfortable allowing Claude Code to read, edit, and execute files within it.
 
-## 6. Complete LifeOS onboarding
+## 5. Complete LifeOS Onboarding
 
-The current setup is conversational rather than relying on the older PAI `install.sh` workflow.
+LifeOS uses a conversational onboarding process rather than the older PAI `install.sh` workflow.
 
-LifeOS may guide you through:
+The setup may guide you through:
 
 - your current state and ideal state
 - TELOS configuration
-- sources or integrations you want to connect
+- sources or integrations
 - optional Claude Code hooks
 - permissions required for additional functionality
 
-Review each proposed change before approving it.
+Review proposed changes and permissions before approving them.
+
+![Claude Code running with the LifeOS environment](./ClaudeCodeLaunch.png)
+
+At this point, the LifeOS environment is installed and ready for configuration.
 
 ---
 
-# Final Architecture
+# PAI vs. LifeOS Setup
+
+The two installations use different approaches:
+
+| PAI v4.0.3 | LifeOS v7.40.4 |
+|---|---|
+| Historical release | Current release used in this walkthrough |
+| Checkout `v4.0.3` | Current installer |
+| Copy `.claude` files | Installer places LifeOS into Claude skills |
+| Run `install.sh` | Run `ourlifeos.ai/install.sh` |
+| Launch with `pai` | Integrates with Claude Code |
+| Older PAI structure | Current LifeOS structure |
+
+The older PAI instructions should therefore not be reused blindly for the current LifeOS release.
+
+---
+
+# Isolation Architecture
+
+If you choose to use separate Linux users, the environment looks approximately like this:
 
 ```text
 Debian 12
@@ -306,15 +391,13 @@ Debian 12
 ├── root
 │    └── system superuser
 │
-├── admin user
-│    ├── sudo access
+├── PAI user
 │    ├── Claude Code
 │    ├── ~/.claude
 │    └── PAI v4.0.3
 │         └── pai
 │
-└── personalai
-     ├── regular/non-sudo account
+└── LifeOS user
      ├── Claude Code
      ├── Bun
      ├── ~/.claude
@@ -322,23 +405,23 @@ Debian 12
           └── ~/.claude/skills/LifeOS
 ```
 
-The important Linux concept is that the two users have separate home directories:
+The important Linux concept is that each user has a separate home directory:
 
 ```text
-/home/<admin-user>
-/home/personalai
+/home/<pai-user>
+/home/<lifeos-user>
 ```
 
-That also means they have separate Claude configuration directories:
+and therefore separate Claude configuration directories:
 
 ```text
-/home/<admin-user>/.claude
-/home/personalai/.claude
+/home/<pai-user>/.claude
+/home/<lifeos-user>/.claude
 ```
 
-The older PAI `pai` alias belongs only to the shell configuration of the user where PAI was installed. It does not automatically become available to other Linux users.
+The PAI `pai` alias belongs to the shell configuration of the user where PAI was installed. It does not automatically become available to other Linux users.
 
-This separation makes it easier to experiment with PAI v4 and LifeOS v7 without overwriting the same Claude configuration.
+Using separate accounts is therefore an **isolation choice for this experiment**, not a LifeOS installation requirement.
 
 ---
 
@@ -346,14 +429,14 @@ This separation makes it easier to experiment with PAI v4 and LifeOS v7 without 
 
 A small VM can become unstable while running a graphical Debian desktop, Claude Code, PAI/LifeOS, Git repositories, and development dependencies.
 
-A more comfortable configuration for this setup is:
+For this environment, a more comfortable VM configuration was:
 
 - **RAM:** about 8–9 GB
 - **CPU:** 4 cores
 - **Root storage:** about 70 GB
 - **Swap:** 4 GB
 
-Check your current resources with:
+Check the current resources with:
 
 ```bash
 free -h
@@ -362,7 +445,7 @@ df -h /
 sudo /sbin/swapon --show
 ```
 
-If the root filesystem becomes nearly full, investigate before deleting system files:
+If the root filesystem becomes nearly full, investigate what is consuming space before deleting files:
 
 ```bash
 sudo du -xhd1 / 2>/dev/null | sort -h
@@ -370,7 +453,7 @@ sudo du -xhd1 /var 2>/dev/null | sort -h
 du -hd1 ~ 2>/dev/null | sort -h
 ```
 
-APT's downloaded package cache can usually be cleared safely with:
+APT's downloaded package cache can usually be cleared with:
 
 ```bash
 sudo apt clean
@@ -380,32 +463,54 @@ sudo apt clean
 
 # Privacy and Permissions
 
-Before connecting personal data, email, credentials, or APIs, review the privacy and data-control settings for the AI services you use.
+Agentic systems can combine model reasoning with access to tools, files, APIs, and other resources. The permissions given to the agent therefore matter.
 
-For Claude, review the current privacy controls in your Claude account settings and choose the data-sharing options that match your preferences.
+Before connecting personal data, email, credentials, or APIs:
 
-Also treat API keys as secrets:
+- review the privacy and data-control settings of the AI services being used
+- review what directories and tools the agent can access
+- grant only the permissions required for the task
+- avoid committing credentials or API keys to Git
+- avoid placing secrets directly in shell history
+- use environment variables or a secrets-management approach when appropriate
 
-- do not commit them to GitHub
-- avoid storing them directly in shell history
-- use environment variables or a secrets-management approach where possible
-- give agents only the permissions they actually need
+For Claude, review the current privacy controls in your Claude account settings and choose the data-sharing options appropriate for your use case.
 
 ---
 
-# Example Use Case: Email Triage
+# Example Agentic Workflow: Email Triage
 
-One possible agentic workflow is automated email triage:
+One possible use case for personal AI infrastructure is email triage.
 
-1. Connect an inbox or email API that the agent is authorized to access.
+A workflow could:
+
+1. Connect to an inbox or email API that the agent is authorized to access.
 2. Provide context explaining which messages are important.
 3. Define categories such as urgent, requires action, informational, or low priority.
 4. Ask the agent to generate a daily summary.
-5. Review the results and correct mistakes so the workflow can be refined.
+5. Review the results and refine the instructions when the agent makes mistakes.
 
-This is a useful way to explore the difference between a simple chatbot and an **agentic system**: the model is not only answering a question, but using tools, context, rules, and multiple steps to complete an ongoing task.
+This demonstrates an important difference between a basic chatbot and an **agentic system**.
 
-For sensitive email, start with a test inbox or non-sensitive sample messages before giving an agent access to a primary mailbox.
+Instead of only responding to a single prompt, the system can combine:
+
+```text
+model
+  +
+instructions
+  +
+context
+  +
+tools
+  +
+permissions
+  +
+multi-step actions
+```
+
+to work toward a larger goal.
+
+For sensitive email, consider beginning with a test inbox or non-sensitive sample messages before granting an agent access to a primary mailbox.
 
 ---
 
