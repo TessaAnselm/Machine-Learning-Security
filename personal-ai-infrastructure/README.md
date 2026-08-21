@@ -338,21 +338,13 @@ curl -fsSL https://ourlifeos.ai/install.sh | bash
   <em>LifeOS v7.40.4 installer starting</em>
 </p>
 
-During this installation, the installer checked its prerequisites, including Bun, and installed the LifeOS skill under the current user’s Claude environment.:
+During this installation, the installer checked its prerequisites and installed the LifeOS skill under the current user's Claude environment:
 
 ```text
 ~/.claude/skills/LifeOS
 ```
 
-The current LifeOS installation process is different from the older PAI v4.0.3 installation.
-
-Do **not** use the old:
-
-```bash
-cp -r .claude ~/
-```
-
-PAI installation method for LifeOS v7.40.4.
+LifeOS uses its own installer and does not follow the PAI v4.0.3 installation steps. In particular, skip the `cp -r .claude ~/` step from Setup 1 — the `ourlifeos.ai` installer above already sets up `~/.claude/skills/LifeOS` for you.
 
 ## 3. Trust the Workspace
 
