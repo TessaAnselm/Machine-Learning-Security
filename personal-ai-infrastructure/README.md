@@ -13,7 +13,7 @@ This walkthrough covers:
 
 ## Environment
 
-![Debian 12 bookworm, confirmed via /etc/os-release](./System.png)
+![Debian 12 bookworm, confirmed via /etc/os-release](./images/System.png)
 
 Both environments run inside a Debian VM rather than directly on the host machine. The VM provides its own filesystem, users, and software environment.
 
@@ -65,7 +65,7 @@ Run:
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-![Claude Code installation on Debian](./InstallClaude.png)
+![Claude Code installation on Debian](./images/InstallClaude.png)
 
 ### Fix the Bash PATH if needed
 
@@ -90,7 +90,7 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-![Adding ~/.local/bin to PATH so the claude command resolves](./Addpath.png)
+![Adding ~/.local/bin to PATH so the claude command resolves](./images/Addpath.png)
 
 Verify:
 
@@ -108,7 +108,7 @@ git clone https://github.com/danielmiessler/Personal_AI_Infrastructure.git
 cd Personal_AI_Infrastructure
 ```
 
-![Cloning the Personal AI Infrastructure repository](./DanielMieslerPAI.png)
+![Cloning the Personal AI Infrastructure repository](./images/DanielMieslerPAI.png)
 
 The current repository may contain a newer release rather than the older `Releases/v4.0.3` directory.
 
@@ -143,7 +143,7 @@ cd ~/.claude
 bash install.sh
 ```
 
-![PAI v4.0.3 installer running on Debian](./PAI.png)
+![PAI v4.0.3 installer running on Debian](./images/PAI.png)
 
 Follow the installer prompts.
 
@@ -167,7 +167,7 @@ If `~/.zshrc` does not exist, run:
 source ~/.bashrc
 ```
 
-![PAI installation completed successfully](./SuccessInstallPAI.png)
+![PAI installation completed successfully](./images/SuccessInstallPAI.png)
 
 ## 6. Verify the PAI launcher
 
@@ -197,7 +197,7 @@ Then launch PAI:
 pai
 ```
 
-![PAI home page loaded successfully](./paiload.png)
+![PAI home page loaded successfully](./images/paiload.png)
 
 If the PAI interface loads, the PAI v4.0.3 environment is ready.
 
@@ -312,7 +312,7 @@ Run the current LifeOS installer:
 curl -fsSL https://ourlifeos.ai/install.sh | bash
 ```
 
-![LifeOS v7.40.4 installer starting](./InstallLifeOS.png)
+![LifeOS v7.40.4 installer starting](./images/InstallLifeOS.png)
 
 During this installation, the installer detected the required prerequisites and installed the LifeOS skill under the current user's Claude environment:
 
@@ -358,7 +358,7 @@ The setup may guide you through:
 
 Review proposed changes and permissions before approving them.
 
-![Claude Code running with the LifeOS environment](./ClaudeCodeLaunch.png)
+![Claude Code running with the LifeOS environment](./images/ClaudeCodeLaunch.png)
 
 At this point, the LifeOS environment is installed and ready for configuration.
 
