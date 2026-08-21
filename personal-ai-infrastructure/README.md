@@ -13,7 +13,11 @@ This walkthrough covers:
 
 ## Environment
 
-![Debian 12 bookworm, confirmed via /etc/os-release](./images/System.png)
+<p align="center">
+  <img src="./images/System.png" alt="Debian 12 bookworm, confirmed via /etc/os-release" width="600">
+  <br>
+  <em>Debian 12 bookworm, confirmed via /etc/os-release</em>
+</p>
 
 Both environments run inside a Debian VM rather than directly on the host machine. The VM provides its own filesystem, users, and software environment.
 
@@ -65,7 +69,11 @@ Run:
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-![Claude Code installation on Debian](./images/InstallClaude.png)
+<p align="center">
+  <img src="./images/InstallClaude.png" alt="Claude Code installation on Debian" width="700">
+  <br>
+  <em>Claude Code installation on Debian</em>
+</p>
 
 ### Fix the Bash PATH if needed
 
@@ -90,7 +98,11 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-![Adding ~/.local/bin to PATH so the claude command resolves](./images/Addpath.png)
+<p align="center">
+  <img src="./images/Addpath.png" alt="Adding ~/.local/bin to PATH so the claude command resolves" width="700">
+  <br>
+  <em>Adding ~/.local/bin to PATH so the claude command resolves</em>
+</p>
 
 Verify:
 
@@ -108,7 +120,11 @@ git clone https://github.com/danielmiessler/Personal_AI_Infrastructure.git
 cd Personal_AI_Infrastructure
 ```
 
-![Cloning the Personal AI Infrastructure repository](./images/DanielMieslerPAI.png)
+<p align="center">
+  <img src="./images/DanielMieslerPAI.png" alt="Cloning the Personal AI Infrastructure repository" width="700">
+  <br>
+  <em>Cloning the Personal AI Infrastructure repository</em>
+</p>
 
 The current repository may contain a newer release rather than the older `Releases/v4.0.3` directory.
 
@@ -143,9 +159,30 @@ cd ~/.claude
 bash install.sh
 ```
 
-![PAI v4.0.3 installer running on Debian](./images/PAI.png)
+<p align="center">
+  <img src="./images/PAI.png" alt="PAI v4.0.3 installer running on Debian" width="500">
+  <br>
+  <em>PAI v4.0.3 installer running on Debian</em>
+</p>
 
 Follow the installer prompts.
+
+### Bun runtime
+
+PAI's installer installs the [Bun](https://bun.sh) runtime automatically — you can see it happen in the installer output above (`Installing Bun runtime...`). Bun is what runs the `pai` launcher (`pai.ts`), so it needs to be present before you can launch PAI.
+
+Verify it's there:
+
+```bash
+bun --version
+```
+
+If it's missing, install it manually:
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+source ~/.bashrc
+```
 
 ### Voice/audio note
 
@@ -167,7 +204,11 @@ If `~/.zshrc` does not exist, run:
 source ~/.bashrc
 ```
 
-![PAI installation completed successfully](./images/SuccessInstallPAI.png)
+<p align="center">
+  <img src="./images/SuccessInstallPAI.png" alt="PAI installation completed successfully" width="500">
+  <br>
+  <em>PAI installation completed successfully</em>
+</p>
 
 ## 6. Verify the PAI launcher
 
@@ -197,7 +238,11 @@ Then launch PAI:
 pai
 ```
 
-![PAI home page loaded successfully](./images/paiload.png)
+<p align="center">
+  <img src="./images/paiload.png" alt="PAI home page loaded successfully" width="550">
+  <br>
+  <em>PAI home page loaded successfully</em>
+</p>
 
 If the PAI interface loads, the PAI v4.0.3 environment is ready.
 
@@ -281,30 +326,7 @@ Verify:
 claude --version
 ```
 
-## 2. Check Bun
-
-Check whether Bun is available:
-
-```bash
-bun --version
-```
-
-If Bun is not installed:
-
-```bash
-curl -fsSL https://bun.sh/install | bash
-source ~/.bashrc
-```
-
-Verify:
-
-```bash
-bun --version
-```
-
-In this environment, LifeOS detected Bun during installation.
-
-## 3. Install LifeOS
+## 2. Install LifeOS
 
 Run the current LifeOS installer:
 
@@ -312,9 +334,13 @@ Run the current LifeOS installer:
 curl -fsSL https://ourlifeos.ai/install.sh | bash
 ```
 
-![LifeOS v7.40.4 installer starting](./images/InstallLifeOS.png)
+<p align="center">
+  <img src="./images/InstallLifeOS.png" alt="LifeOS v7.40.4 installer starting" width="700">
+  <br>
+  <em>LifeOS v7.40.4 installer starting</em>
+</p>
 
-During this installation, the installer detected the required prerequisites and installed the LifeOS skill under the current user's Claude environment:
+During this installation, the installer checked its prerequisites, including Bun, and installed the LifeOS skill under the current user’s Claude environment.:
 
 ```text
 ~/.claude/skills/LifeOS
@@ -330,7 +356,7 @@ cp -r .claude ~/
 
 PAI installation method for LifeOS v7.40.4.
 
-## 4. Trust the Workspace
+## 3. Trust the Workspace
 
 During setup, Claude Code may display:
 
@@ -344,7 +370,7 @@ Is this a project you created or one you trust?
 
 Only select **Yes** if you trust the project directory and are comfortable allowing Claude Code to read, edit, and execute files within it.
 
-## 5. Complete LifeOS Onboarding
+## 4. Complete LifeOS Onboarding
 
 LifeOS uses a conversational onboarding process rather than the older PAI `install.sh` workflow.
 
@@ -358,7 +384,11 @@ The setup may guide you through:
 
 Review proposed changes and permissions before approving them.
 
-![Claude Code running with the LifeOS environment](./images/ClaudeCodeLaunch.png)
+<p align="center">
+  <img src="./images/ClaudeCodeLaunch.png" alt="Claude Code running with the LifeOS environment" width="700">
+  <br>
+  <em>Claude Code running with the LifeOS environment</em>
+</p>
 
 At this point, the LifeOS environment is installed and ready for configuration.
 
@@ -393,13 +423,13 @@ Debian 12
 │
 ├── PAI user
 │    ├── Claude Code
+│    ├── Bun
 │    ├── ~/.claude
 │    └── PAI v4.0.3
 │         └── pai
 │
 └── LifeOS user
      ├── Claude Code
-     ├── Bun
      ├── ~/.claude
      └── LifeOS v7.40.4
           └── ~/.claude/skills/LifeOS
