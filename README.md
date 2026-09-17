@@ -24,6 +24,22 @@ The project explores:
 - exploring privacy and security considerations
 - experimenting with agentic workflows such as email triage
 
+### CAPTCHA Breaking
+
+[View the project walkthrough](./captcha-breaking/README.md)
+
+An end-to-end offense/defense demo: a real distorted-text CAPTCHA server, and a
+CNN trained to break it — reaching a 92% live solve rate via transfer learning from a
+pretrained ResNet18.
+
+The project explores:
+
+- generating and training against a real, self-hosted CAPTCHA server
+- why a classic segmentation-based OCR attack fails against modern noise/distortion
+- iterating from a from-scratch CNN (52-62%) to pretrained-backbone transfer learning (92%)
+- measuring both offline (validation) and live attack accuracy
+- what actually defends against this class of attack in practice
+
 ## AI-Assisted Development
 
 Some projects in this repository use Claude Code for AI-assisted development.
@@ -49,7 +65,10 @@ Machine-Learning-Security/
 ├── README.md
 ├── CLAUDE.md
 │
-└── personal-ai-infrastructure/
+├── personal-ai-infrastructure/
+│   └── README.md
+│
+└── captcha-breaking/
     └── README.md
 ```
 

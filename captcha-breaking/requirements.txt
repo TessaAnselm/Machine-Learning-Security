@@ -1,0 +1,7 @@
+flask
+captcha
+torch
+torchvision
+pillow
+numpy
+requests
