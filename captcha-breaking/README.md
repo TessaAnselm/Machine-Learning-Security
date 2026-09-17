@@ -58,8 +58,8 @@ a pretrained backbone already carries broad visual knowledge from millions of re
 — which is a much smaller ask, and it shows in both the accuracy and how few epochs it
 took to get there.
 
-A naive contour-based segmentation attack (crop each letter, classify individually —
-the classic approach used by [Sam Bowne's CAPTCHA-breaking tutorial][samsclass], which
+A contour-based segmentation attack (crop each letter, classify individually — the
+classic approach used by [Sam Bowne's CAPTCHA-breaking tutorial][samsclass], which
 reports 93% train / 86% test accuracy) was also tried and rejected here: it only isolated
 exactly 5 clean letters on 4.5% of images, because the `captcha` library's noise curves are
 specifically drawn to cross letter boundaries and defeat that trick (see `segment.py`).
