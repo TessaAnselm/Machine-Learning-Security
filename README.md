@@ -42,7 +42,7 @@ The project explores:
 
 ### ThreatVote AI
 
-[View the project walkthrough](./projects/threatvote-ai/README.md)
+[View the project walkthrough](./threatvote-ai/README.md)
 
 An interactive cybersecurity detection lab comparing ensemble learning
 methods — Decision Tree, Random Forest, AdaBoost, and a Voting Classifier —
@@ -88,9 +88,8 @@ Machine-Learning-Security/
 ├── captcha-breaking/
 │   └── README.md
 │
-└── projects/
-    └── threatvote-ai/
-        └── README.md
+└── threatvote-ai/
+    └── README.md
 ```
 
 ## Acknowledgments

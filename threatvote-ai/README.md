@@ -117,7 +117,7 @@ substitute for the real dataset when evaluating actual detection accuracy.
 ## Setup
 
 ```bash
-cd projects/threatvote-ai
+cd threatvote-ai
 python3 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
