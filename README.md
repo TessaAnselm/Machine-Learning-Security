@@ -40,6 +40,23 @@ The project explores:
 - measuring both offline (validation) and live attack accuracy
 - what actually defends against this class of attack in practice
 
+### ThreatVote AI
+
+[View the project walkthrough](./projects/threatvote-ai/README.md)
+
+An interactive cybersecurity detection lab comparing ensemble learning
+methods — Decision Tree, Random Forest, AdaBoost, and a Voting Classifier —
+on labeled network traffic (CIC-IDS2017-style flows), with a Streamlit
+dashboard for live hyperparameter tuning and false-positive/false-negative
+analysis.
+
+The project explores:
+
+- bagging vs. boosting ensembles for network intrusion detection
+- avoiding data leakage (identifier columns, duplicate flows, train/test separation)
+- how hyperparameters (tree depth, boosting iterations, learning rate) shift the accuracy/recall tradeoff
+- where each model's false positives and false negatives land, by attack family
+
 ## AI-Assisted Development
 
 Some projects in this repository use Claude Code for AI-assisted development.
@@ -68,8 +85,12 @@ Machine-Learning-Security/
 ├── personal-ai-infrastructure/
 │   └── README.md
 │
-└── captcha-breaking/
-    └── README.md
+├── captcha-breaking/
+│   └── README.md
+│
+└── projects/
+    └── threatvote-ai/
+        └── README.md
 ```
 
 ## Acknowledgments
