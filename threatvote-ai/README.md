@@ -1,155 +1,227 @@
 # ThreatVote AI
 
-An interactive lab for cybersecurity threat detection using ensemble learning.
-Four classifiers — Decision Tree, Random Forest, AdaBoost, and a Voting
-Classifier combining all three — compete on the same labeled network-traffic
-split, so you can see directly where ensembling helps and where it doesn't.
+ThreatVote AI is a custom React app with a Python backend for exploring how machine learning detects attacks in network traffic. Monster, an animated cookie-loving guide, leads you through three hands-on missions: guess the winning detector, compare models, and investigate mistakes.
 
-```mermaid
-flowchart LR
-    D[Labeled traffic\nCIC-IDS2017-style flows] -->|one stratified split| TR[Train set]
-    D -->|held out| TE[Test set]
-    TR --> M1[Decision Tree]
-    TR --> M2[Random Forest]
-    TR --> M3[AdaBoost]
-    M1 & M2 & M3 --> V[Voting Ensemble]
-    M1 & M2 & M3 & V -->|predict only| TE
-    TE --> S[Scored: accuracy, precision,\nrecall, F1, confusion matrix]
+Each model predicts **benign traffic** or **attack traffic**. Attack names such as `DDoS` and `PortScan` help you inspect mistakes; the models do not predict the attack type.
+
+**The app starts with a bundled synthetic dataset.** You can try it without downloading data. Use the sample to learn how the app works; its scores do not measure real-world detection performance.
+
+## Quick start
+
+You need Python and **Node.js 22.12 or newer** (with npm). Choose either Conda or Python's built-in virtual environment (`venv`) for the backend. Run the commands from the project folder; skip `cd threatvote-ai` if your terminal is already there.
+
+### Option 1: Conda
+
+With Conda installed, create and activate an environment, then install the project's dependencies with pip:
+
+```bash
+cd threatvote-ai
+conda create -n threatvote-ai python pip
+conda activate threatvote-ai
+python -m pip install -r requirements.txt
 ```
 
-## Why this matters
+If the environment already exists, skip `conda create`. These commands also work in an Anaconda Prompt on Windows.
 
-Network intrusion detection is a binary classification problem with a nasty
-property: the interesting class (attacks) is rare, and the cost of a miss
-(false negative) is very different from the cost of a false alarm (false
-positive). Ensemble methods — bagging (Random Forest) and boosting
-(AdaBoost) — exist specifically to squeeze more signal out of weak learners
-like a single decision tree. This project makes that tradeoff visible and
-interactive: change the number of trees, the boosting iterations, or the
-learning rate, and watch the confusion matrix move.
+### Option 2: venv
 
-## Features
+You need Python and pip installed:
 
-1. **Threat Detection Dashboard** — traffic composition by label, a confusion
-   matrix for the best-performing model, and a sample of the labeled data.
-2. **Model Battle** — all four models' accuracy, precision, recall, F1, and
-   confusion matrices, side by side.
-3. **Detection Failure Lab** — pick a model and see its actual false
-   positives and false negatives, including which attack families it misses.
-4. **Interactive Controls** — sidebar sliders for tree depth, number of
-   trees, boosting iterations, learning rate, test-set size, and random seed.
-5. **Model Evaluation** — accuracy, precision, recall, F1, and confusion
-   matrices for every model, recomputed live as you change the controls.
-
-## How this avoids data leakage
-
-- **One split, done once, before any model is fit.** `data.split()` performs
-  a single `train_test_split`; every model in the Model Battle trains on the
-  exact same `X_train`/`y_train` and is scored only on `X_test`/`y_test`,
-  which it never saw during `.fit()`.
-- **No fitted preprocessing before the split.** Tree-based models need no
-  scaling or encoding, so there is no scaler/encoder fit on the full dataset
-  that could leak test-set statistics into training.
-- **Identifier columns are dropped, not just unused.** Flow ID, source/destination
-  IP, source port, and timestamp are removed before the split — a model that
-  keeps these can memorize *which capture* a flow came from (and thus its
-  label) instead of learning what attack traffic looks like.
-- **Exact duplicate flows are dropped.** CIC-IDS2017 contains many duplicate
-  rows; left in, the same row can land in both train and test, inflating the
-  test score.
-- **Stratified by attack family.** The split keeps class proportions (and,
-  where possible, each individual attack family) balanced across train and
-  test, so rare attack types still appear in both.
-- **Attack family is never a feature.** The granular label (e.g. `"DoS Hulk"`)
-  is only used to annotate predictions in the Detection Failure Lab, never
-  passed to `.fit()`.
-
-## Project layout
-
-```
-threatvote-ai/
-├── app.py            Streamlit app (3 tabs)
-├── data.py           Dataset generation, cleaning, leakage-safe split
-├── models.py         Model construction, training, evaluation
-├── requirements.txt
-├── data/
-│   ├── sample/       Bundled synthetic sample (committed, small)
-│   └── raw/          Real CIC-IDS2017 CSVs go here (gitignored, not committed)
-└── tests/
-    ├── test_data.py
-    └── test_models.py
+```bash
+cd threatvote-ai
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
-## Dataset
+On Windows, use `python` instead of `python3` and activate the environment with the command for your shell:
 
-### Bundled sample (default, works out of the box)
+```powershell
+# PowerShell
+.venv\Scripts\Activate.ps1
+```
 
-`data/sample/cicids2017_sample.csv` is a small (4,000-row), synthetically
-generated dataset that mimics the column names and six most common classes
-of the real CIC-IDS2017 "GeneratedLabelledFlows" CSVs (`BENIGN`, `DoS Hulk`,
-`DDoS`, `PortScan`, `Bot`, `Web Attack - Brute Force`). It's generated with a
-fixed random seed (`data.py`'s `generate_sample`), so it's fully reproducible
-and requires no download. Regenerate it any time with:
+```bat
+:: Command Prompt
+.venv\Scripts\activate.bat
+```
+
+### Build the frontend (once, and after frontend changes)
+
+```bash
+cd frontend
+npm ci
+npm run build
+cd ..
+```
+
+### Start the app
+
+With your Python environment activated, run from the project folder:
+
+```bash
+python server.py
+```
+
+Open **[localhost:8000](http://localhost:8000)**. This command serves both the React interface and Python API. The first experiment trains all four models before showing the results. Keep the terminal running; press Ctrl+C to stop it.
+
+For later Conda sessions, you only need `conda activate threatvote-ai` and `python server.py` from the project folder. You no longer need the Streamlit command for the custom frontend.
+
+## Try the app
+
+1. Start with the default **Synthetic demo data**.
+2. Follow the animated Monster guide in **Meet the traffic**. Pick the detector you think catches the most attacks, then click **Check my guess**.
+3. Click **Compare detectors** to compare two detectors. Choose your favorite after checking missed attacks and false alarms.
+4. In **Find the mistakes**, answer Monster's question and inspect a detector's mistakes. Finish all three missions to complete the adventure.
+5. For another experiment, open **Lab settings** in the sidebar and change one setting, then click **Apply & retrain**. Mission progress resets after successful retraining. If training fails, the previous results and progress remain available.
+
+Use the mission sidebar to navigate at any time. Monster talks with mouth movements, blinks, and bites and chews its cookie in a silent looping GIF. It also wiggles to celebrate successful answers and choices. Turn off **Animate Monster** for a still character; the animation also respects your device's reduced-motion preference. Your motion preference is saved in the browser; mission progress lasts for the current page session.
+
+The app shows one mission at a time:
+
+| Mission | What you can do |
+| --- | --- |
+| **Meet the traffic** | Guess the winning detector, reveal its results, and explore labeled traffic. |
+| **Compare detectors** | Compare two detectors side by side and choose one; expand scores and confusion matrices for more detail. |
+| **Find the mistakes** | Answer a missed-attack question and inspect false alarms and missed attacks by family. |
+
+**Lab settings** is collapsed initially and contains the data source, test-set size, random seed, tree depth, number of forest trees, boosting iterations, and learning rate. Edits are applied only when you click **Apply & retrain**. Keeping the same settings and random seed makes runs repeatable. A visible demo-data notice identifies the synthetic sample.
+
+## Understand the results
+
+The app trains models on one portion of the data and evaluates them on a separate **test set**. By default, 75% of the rows are used for training and 25% for testing.
+
+| Metric | What it tells you |
+| --- | --- |
+| **Accuracy** | Of all test rows, how many were classified correctly? |
+| **Precision** | Of the rows flagged as attacks, how many were actually attacks? |
+| **Recall** | Of the actual attacks, how many did the model catch? |
+| **F1** | A combined score that balances precision and recall. |
+
+Scores range from 0 to 1; higher is better. Accuracy alone can be misleading when most traffic is benign, so compare precision and recall too.
+
+A **confusion matrix** counts correct predictions and mistakes. Its rows show the actual label, and its columns show the predicted label:
+
+- **True positive:** an attack correctly flagged.
+- **True negative:** benign traffic correctly classified.
+- **False positive:** benign traffic flagged as an attack—a false alarm.
+- **False negative:** an attack classified as benign—a missed attack.
+
+## Models compared
+
+| Model | How it works |
+| --- | --- |
+| **Decision Tree** | Learns a sequence of rules from traffic features. |
+| **Random Forest** | Combines many decision trees to make a prediction. |
+| **AdaBoost** | Builds a sequence of small models, giving more attention to examples that earlier models got wrong. |
+| **Voting Ensemble** | Averages the attack probabilities from a Decision Tree, Random Forest, and AdaBoost model to make a final prediction. |
+
+Combining models is called **ensemble learning**. It can improve results, but the voting ensemble is not guaranteed to outperform every individual model.
+
+## Data sources
+
+### Bundled sample
+
+`data/sample/cicids2017_sample.csv` contains 4,000 synthetic rows with CIC-IDS2017-style traffic features and six labels: `BENIGN`, `DoS Hulk`, `DDoS`, `PortScan`, `Bot`, and `Web Attack - Brute Force`.
+
+The sample is generated with a fixed random seed. If the file is missing, the app creates it automatically. To regenerate it manually:
 
 ```bash
 python data.py
 ```
 
-This sample is for development and demoing the app's mechanics — it is not a
-substitute for the real dataset when evaluating actual detection accuracy.
+### Real CIC-IDS2017 data (optional)
 
-### Real CIC-IDS2017 (optional, for realistic results)
+1. Download the labeled flow CSVs (the `GeneratedLabelledFlows` files) from the [Canadian Institute for Cybersecurity's CIC-IDS2017 page](https://www.unb.ca/cic/datasets/ids-2017.html).
+2. Create a `data/raw/` folder and copy the extracted `.csv` files into it. For example: `data/raw/Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv`.
+3. Refresh the page, open **Lab settings**, and select a file in **Traffic source**. Each file is a separate data source.
+4. Adjust **Maximum rows** to control how many cleaned rows are used for training and testing, then click **Apply & retrain**. The default is 20,000; larger samples may take longer to train.
 
-1. Download the CSV flow files ("GeneratedLabelledFlows", ~230 MB zipped)
-   from the Canadian Institute for Cybersecurity:
-   https://www.unb.ca/cic/datasets/ids-2017.html
-2. Unzip, and copy one or more of the per-day CSVs (e.g.
-   `Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv`) into `data/raw/` in
-   this project.
-3. **Do not commit these files.** `data/raw/` is already in `.gitignore`;
-   the full dataset is multiple gigabytes and is not meant to live in this
-   (or any) Git repository.
-4. Launch the app — any CSV found in `data/raw/` appears as a selectable
-   data source in the sidebar. Real files are capped to a configurable
-   number of rows (sidebar slider) before training, since the raw CSVs can
-   have millions of rows.
+`data/raw/` is ignored by Git. Keep downloaded datasets out of commits.
 
-## Setup
+## How data is prepared
 
-```bash
-cd threatvote-ai
-python3 -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+Both data sources follow the same process:
+
+1. Remove identifying columns: Flow ID, source IP, destination IP, source port, and timestamp.
+2. Convert traffic features to numbers and remove rows with missing or infinite values.
+3. Remove exact duplicate rows after cleaning.
+4. Split the data once into training and test sets, preserving attack-family proportions when possible. If a family has fewer than two rows, the split uses benign/attack proportions instead.
+5. Train all four models on the same training set and score them on the same test set.
+
+The original attack-family label is excluded from the input features. No scaler or other preprocessing is fitted on the full dataset before the split. These choices reduce **data leakage**, where information from the test set makes results look better than they should.
+
+This is an educational lab for labeled CSV data. Its test scores describe the selected dataset and split; they do not establish performance on live network traffic.
+
+## Project files
+
+```text
+threatvote-ai/
+├── server.py         Local Python API and React frontend host
+├── frontend/         Custom React interface, styling, and tests
+│   ├── src/
+│   ├── package.json
+│   └── dist/         Generated by npm run build (not committed)
+├── app.py            Previous Streamlit interface (optional)
+├── data.py           Sample generation, CSV loading, cleaning, and splitting
+├── models.py         Model construction, training, and evaluation
+├── monster_guide.py  Animated character and mission messages
+├── Monster.png       Guide character artwork
+├── monster-talking.gif        Talking and cookie-munching animation
+├── monster-talking-still.png  Still version for reduced motion
+├── assets/           Animation sprite sheet and generation prompt
+├── scripts/          GIF build script (requires Pillow)
+├── requirements.txt  Python dependencies
+├── data/
+│   ├── sample/       Bundled synthetic dataset
+│   └── raw/          Optional downloaded CSVs (create this folder as needed)
+└── tests/
+    ├── test_app.py
+    ├── test_data.py
+    ├── test_server.py
+    └── test_models.py
 ```
 
-## Running the app
+## Run the tests
+
+With your Conda or venv environment activated, run:
 
 ```bash
-streamlit run app.py
+python -m pytest
 ```
 
-This opens the dashboard at `http://localhost:8501`. Use the sidebar to pick
-a data source, adjust the train/test split, and tune each model's
-hyperparameters — all three tabs recompute live.
-
-## Running the tests
+The Python tests check data preparation, model evaluation, API responses, input validation, dataset cache invalidation, static-file serving, and the previous Streamlit interface. To run the React mission and interaction tests:
 
 ```bash
-pytest
+cd frontend
+npm test
 ```
 
-Tests cover: reproducibility of the synthetic sample, cleaning (identifier
-columns dropped, duplicates removed, no `inf`/`NaN` survives), that the
-train/test split has no overlapping rows and every attack family appears in
-both splits, that the attack-family label is never used as a feature, and
-that each model's metrics land in `[0, 1]` and respond to their
-hyperparameters.
+## Frontend development
 
-## Status
+Run the API in one terminal with your Python environment activated:
 
-Minimum viable product. All five requested features are implemented end to
-end against the bundled sample dataset and work against real CIC-IDS2017
-CSVs dropped into `data/raw/`. Possible next steps: additional engineered
-features from raw CIC-IDS2017 columns, SHAP-based feature-importance views,
-and saving/loading trained models.
+```bash
+python server.py --api-only
+```
+
+In a second terminal, start Vite from the frontend folder:
+
+```bash
+cd frontend
+npm run dev
+```
+
+Open the URL Vite prints (usually `http://localhost:5173`). Vite forwards `/api` and `/mascot` requests to Python on port 8000 and updates the page when frontend files change.
+
+The server runs locally on your machine. It caches the four most recent experiments in memory; changing a CSV invalidates its cached result. Restarting the server clears the cache. The previous Streamlit interface remains available with `python -m streamlit run app.py` if needed.
+
+## Animation assets
+
+To rebuild the GIF from its saved sprite sheet (with Pillow installed):
+
+```bash
+python scripts/build_monster_gif.py assets/monster-talking-sprites.png
+```
+
+The sprite sheet was created with the built-in image generation tool using `Monster.png` as its character reference. The exact prompt is saved in `assets/monster-animation-prompt.txt`.
