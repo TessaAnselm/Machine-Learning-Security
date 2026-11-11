@@ -1,0 +1,10 @@
+Loading MNIST subset (2000 train / 1000 test)...
+
+Baseline (clean) test accuracy: 0.8870
+Baseline (clean) incorrect '2' predictions: 12
+
+Poisoned | No defense |   Defense |  Caught |  False+ |  Acc (defended)
+---------------------------------------------------------------------------
+      10 |         15 |        11 |  10/10  |     187 |          0.8920
+      30 |         28 |        17 |  26/30  |     197 |          0.8920
+     100 |         66 |        60 |  53/100 |     226 |          0.8510

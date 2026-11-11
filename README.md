@@ -74,6 +74,22 @@ The project explores:
 - verdict/category inconsistency on repeated identical prompts despite `temperature: 0`
 - running Ollama disposably in Docker with no persistent local install
 
+### Data Poisoning: Label-Flip Attack and a k-NN Defense
+
+[View the project walkthrough](./data-poisoning-defense/README.md)
+
+An extension of a label-flipping data-poisoning demo on MNIST/SVM: adds a k-NN
+label-consistency defense and measures exactly where it stops working as the
+attack scales up, rather than just reporting the attack's own error count.
+
+The project explores:
+
+- label-flip poisoning at increasing scale (10/30/100 samples) on an SVM digit classifier
+- a k-NN majority-vote defense that catches poisoned samples before training
+- why the defense's catch rate collapses (100% → 87% → 53%) as poisoned points
+  become dense enough to out-vote their own neighborhood
+- the gap between "samples caught" and "accuracy actually recovered"
+
 ## AI-Assisted Development
 
 Some projects in this repository use Claude Code for AI-assisted development.
@@ -108,10 +124,14 @@ Machine-Learning-Security/
 ├── threatvote-ai/
 │   └── README.md
 │
-└── llama-guard-testing/
+├── llama-guard-testing/
+│   ├── README.md
+│   ├── run-llama-guard.sh
+│   └── transcript.txt
+│
+└── data-poisoning-defense/
     ├── README.md
-    ├── run-llama-guard.sh
-    └── transcript.txt
+    └── poison_defense.py
 ```
 
 ## Acknowledgments
