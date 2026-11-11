@@ -57,6 +57,23 @@ The project explores:
 - how hyperparameters (tree depth, boosting iterations, learning rate) shift the accuracy/recall tradeoff
 - where each model's false positives and false negatives land, by attack family
 
+### Llama Guard Content Moderation Testing
+
+[View the project walkthrough](./llama-guard-testing/README.md)
+
+An offense/defense test of Meta's Llama Guard 3 (1B) content-moderation
+classifier, run locally via Ollama in an ephemeral Docker container — testing
+whether direct and disguised ("masked") unsafe prompts get caught, and
+whether identical prompts get consistent verdicts across repeated calls.
+
+The project explores:
+
+- direct vs. disguised (fictional-framing) unsafe prompts as a jailbreak test
+- a fictional-framing bypass that actually worked, then stopped working on
+  identical input
+- verdict/category inconsistency on repeated identical prompts despite `temperature: 0`
+- running Ollama disposably in Docker with no persistent local install
+
 ## AI-Assisted Development
 
 Some projects in this repository use Claude Code for AI-assisted development.
@@ -88,8 +105,13 @@ Machine-Learning-Security/
 ├── captcha-breaking/
 │   └── README.md
 │
-└── threatvote-ai/
-    └── README.md
+├── threatvote-ai/
+│   └── README.md
+│
+└── llama-guard-testing/
+    ├── README.md
+    ├── run-llama-guard.sh
+    └── transcript.txt
 ```
 
 ## Acknowledgments
